@@ -136,7 +136,7 @@
     </div>
 
     <button id="iniciarSistema">
-        CLIQUE AQUI PARA INICIAR O SISTEMA DE AVISOS DE VOZ
+        CLIQUE AQUI PARA INICIAR O SISTEMA DE AVISOS DE VOZ (E MANTER A TELA LIGADA)
     </button>
     <div class="tabs" id="tabs-container">
     </div>
@@ -147,6 +147,63 @@
 </div>
 
 <script>
+    // =======================================================
+    // 🚀 INÍCIO DO WAKE LOCK API (Bloqueio de Tela) 🚀
+    // =======================================================
+    let wakeLock = null;
+
+    /**
+     * Tenta solicitar o bloqueio da tela.
+     * Deve ser chamada após uma interação do usuário.
+     */
+    const requestWakeLock = async () => {
+        // Se a API não for suportada, ou se já estiver ativo, retorna.
+        if (!('wakeLock' in navigator) || wakeLock !== null) return; 
+        
+        try {
+            // Solicita o bloqueio de tela
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('✅ Screen Wake Lock Ativo! Tela não apagará.');
+
+            // Adiciona um listener para reativar o bloqueio se for liberado automaticamente
+            wakeLock.addEventListener('release', () => {
+                console.log('Bloqueio de tela liberado pelo sistema.');
+                wakeLock = null; // Zera a referência
+            });
+        } catch (err) {
+            console.error(`❌ Erro ao solicitar Wake Lock: ${err.name}, ${err.message}`);
+            wakeLock = null; 
+        }
+    };
+
+    /**
+     * Tenta liberar o bloqueio da tela (Não é usado neste contexto, mas bom ter).
+     */
+    const releaseWakeLock = async () => {
+        if (wakeLock !== null) {
+            await wakeLock.release();
+            wakeLock = null;
+            console.log('Bloqueio de tela liberado manualmente.');
+        }
+    };
+
+    /**
+     * Lida com a visibilidade da página para tentar reativar o bloqueio ao voltar
+     */
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            requestWakeLock();
+        } 
+    };
+
+    // Adiciona o listener de visibilidade para reativar o lock quando o usuário volta para a aba
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // =======================================================
+    // 🛑 FIM DO WAKE LOCK API 🛑
+    // =======================================================
+
+
     // -----------------------------------------------------------------------------------
     // DADOS FIXOS E ESTADO GLOBAL (SEM LOCALSTORAGE)
     // -----------------------------------------------------------------------------------
@@ -358,10 +415,10 @@
 
             if (tempoAtual === TURNO_FIM) {
                  html += `
-                    <div>
-                        <input type="time" id="hora_${nomeProduto}_${i}" value="${tempoAtual.substring(0, 8)}" step="1" readonly style="color: red; font-weight: bold;">
-                    </div>
-                `;
+                     <div>
+                         <input type="time" id="hora_${nomeProduto}_${i}" value="${tempoAtual.substring(0, 8)}" step="1" readonly style="color: red; font-weight: bold;">
+                     </div>
+                 `;
                  break; 
             }
             
@@ -460,7 +517,9 @@
         
         // Apenas verifica avisos de voz se o turno ainda não acabou.
         if (timeToSeconds(horarioBrasilia) <= TURNO_FIM_SEGUNDOS) {
-            verificarHorarioCaixas(horarioBrasilia, estadoAtual.produtoAtivo);
+            if (sistemaIniciado) {
+                verificarHorarioCaixas(horarioBrasilia, estadoAtual.produtoAtivo);
+            }
         }
     }
 
@@ -556,6 +615,9 @@
         if (botao) {
             botao.remove(); 
         }
+
+        // Tenta ativar o Wake Lock assim que o usuário clica no botão "Iniciar Sistema"
+        requestWakeLock(); 
         
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
@@ -586,15 +648,14 @@
         }
         
         atualizarRelogio();
+        
+        // Tenta ativar o Wake Lock no carregamento (melhor prática: fazemos no clique também)
+        requestWakeLock();
     }
 
     // Inicia tudo
-    inicializar();
-    // Inicializações
-        document.addEventListener('DOMContentLoaded', () => {
-             displayLocalPunches();
-             requestWakeLock(); // Tenta ativar o Wake Lock assim que a página carrega
-        });
+    document.addEventListener('DOMContentLoaded', inicializar);
+
 </script>
 
 </body>

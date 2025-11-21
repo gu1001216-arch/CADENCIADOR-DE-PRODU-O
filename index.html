@@ -655,9 +655,79 @@
 
     // Inicia tudo
     document.addEventListener('DOMContentLoaded', inicializar);
+// ... [Seu código HTML e CSS permanecem os mesmos] ...
 
+<script>
+    // =======================================================
+    // 🚀 INÍCIO DO WAKE LOCK API (Bloqueio de Tela) 🚀
+    // =======================================================
+    let wakeLock = null;
+
+    /**
+     * Tenta solicitar o bloqueio da tela.
+     */
+    const requestWakeLock = async () => {
+        // Se a API não for suportada, sai.
+        if (!('wakeLock' in navigator)) {
+            console.warn('❌ Wake Lock API não suportada neste navegador.');
+            return;
+        }
+
+        // Se já estiver ativo, não tenta novamente.
+        if (wakeLock !== null) return;
+        
+        try {
+            // Solicita o bloqueio de tela
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('✅ Screen Wake Lock Ativo! Tela não apagará.');
+
+            // Adiciona um listener para REATIVAR o bloqueio se for liberado automaticamente
+            wakeLock.addEventListener('release', () => {
+                console.log('⚠️ Bloqueio de tela liberado pelo sistema (Release Event). Tentando reativar...');
+                // Tenta reativar o lock imediatamente se a página estiver visível.
+                if (document.visibilityState === 'visible') {
+                    requestWakeLock();
+                } else {
+                     wakeLock = null; // Zera a referência se foi liberado enquanto estava invisível.
+                }
+            });
+            
+        } catch (err) {
+            console.error(`❌ Erro ao solicitar Wake Lock: ${err.name}, ${err.message}`);
+            wakeLock = null; 
+        }
+    };
+
+    /**
+     * Lida com a visibilidade da página para tentar reativar o bloqueio ao voltar
+     */
+    const handleVisibilityChange = () => {
+        // Tenta reativar o Wake Lock quando a página volta a ser visível
+        if (document.visibilityState === 'visible') {
+            console.log('Página ficou visível. Tentando reativar Wake Lock.');
+            requestWakeLock();
+        } else {
+            // Opcional: Se a página fica invisível (usuário trocou de aba/app), o lock pode ser liberado
+            // O navegador faz isso automaticamente, mas é bom ter a lógica de reativação no 'release'
+            console.log('Página ficou invisível.');
+        }
+    };
+
+    // Adiciona o listener de visibilidade
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // =======================================================
+    // 🛑 FIM DO WAKE LOCK API 🛑
+    // =======================================================
+
+// ... [O restante do seu código JavaScript, incluindo a função iniciarSistema, permanece o mesmo] ...
+
+</script>
+</body>
+</html>
 </script>
 
 </body>
 
 </html>
+

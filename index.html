@@ -512,6 +512,7 @@
 
     /**
      * Salva uma observação específica no localStorage e no cache.
+     * **Chamada pelo evento ONINPUT (alteração imediata do texto).**
      * @param {string} produto Nome do produto.
      * @param {number} ciclo Número do ciclo.
      * @param {string} texto Texto da observação.
@@ -522,7 +523,7 @@
         // 1. Atualiza o texto
         estadoAtual.observacoesSalvas[ciclo].obs = texto.trim();
 
-        // 2. Salva no localStorage
+        // 2. Salva no localStorage (Salvamento imediato, corrigindo o problema de sobrescrita)
         salvarNoLocalStorage(produto);
     }
 
@@ -812,7 +813,7 @@
                                 id="obs_${nomeProduto}_${i}" 
                                 value="${textoObservacao}" 
                                 class="observation-input"
-                                onchange="salvarObservacao('${nomeProduto}', ${i}, this.value)">
+                                oninput="salvarObservacao('${nomeProduto}', ${i}, this.value)">
                         </td>
                     </tr>
                 `;
@@ -843,7 +844,7 @@
                                 id="obs_${nomeProduto}_${i}" 
                                 value="${textoObservacao}" 
                                 class="observation-input"
-                                onchange="salvarObservacao('${nomeProduto}', ${i}, this.value)">
+                                oninput="salvarObservacao('${nomeProduto}', ${i}, this.value)">
                         </td>
                     </tr>
                 `;
@@ -1254,13 +1255,6 @@
                 if (horaCaixa && horaCaixa.value === horarioBrasilia) {
                     
                     lerTextoEmVoz("Ciclo finalizado"); 
-                    
-                    // RE-RENDERIZA a aba para que o ciclo recém-concluído mostre o checkbox
-                    // Removendo o re-render (trocarAba) aqui, pois ele está causando 
-                    // a re-renderização total e possivelmente o conflito de texto. 
-                    // O `atualizarStatusTabela` dentro de `atualizarRelogio` já cuida disso.
-                    
-                    // trocarAba(produto); // LINHA ORIGINAL REMOVIDA
                     
                     if (horarioBrasilia === TURNO_FIM) {
                          lerTextoEmVoz("Turno finalizado às 17 horas e 30 minutos.");

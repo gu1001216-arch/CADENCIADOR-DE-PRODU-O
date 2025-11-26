@@ -480,10 +480,11 @@
         }
         
         // 4. Se a observação for o texto padrão, atualiza-a para refletir o status.
+        //    Apenas atualiza o texto se ele for um dos textos Padrão ou vazio
         const currentObs = estadoAtual.observacoesSalvas[ciclo].obs;
         const defaultObsTexts = ['Ciclo concluído', 'NÃO CONCLUÍDO', 'Fim do turno atingido', ''];
         
-        if (defaultObsTexts.includes(currentObs)) {
+        if (defaultObsTexts.includes(currentObs.trim())) {
             let newObsText = '';
             if (isChecked) {
                 // Tenta manter o status de Fim de Turno se for o caso
@@ -500,6 +501,7 @@
             }
             estadoAtual.observacoesSalvas[ciclo].obs = newObsText;
         }
+
 
         // 5. Salva no localStorage
         salvarNoLocalStorage(produto);
@@ -725,6 +727,7 @@
         const limiteCiclos = 500; 
         const minutosTact = tactTime;
         const horarioAtualBrasilia = secondsToTime(getNowInSeconds()); 
+        const defaultObsTexts = ['Ciclo concluído', 'NÃO CONCLUÍDO', 'Fim do turno atingido', ''];
         
         // Carrega as observações salvas no cache
         estadoAtual.observacoesSalvas = carregarObservacoes(nomeProduto);
@@ -758,21 +761,25 @@
                 if (isChecked) {
                     statusText = 'CONCLUÍDO';
                     statusClasseGeral = 'status-concluido';
-                    // Define texto padrão se não houver edição manual/texto salvo
-                    if (!observacaoPersonalizada || observacaoPersonalizada === 'Ciclo concluído' || observacaoPersonalizada === 'NÃO CONCLUÍDO' || observacaoPersonalizada === 'Fim do turno atingido') {
-                         textoObservacao = (timeToSeconds(tempoAtual) === TURNO_FIM_SEGUNDOS) ? 'Fim do turno atingido' : 'Ciclo concluído';
+                    
+                    if (observacaoPersonalizada && !defaultObsTexts.includes(observacaoPersonalizada.trim())) {
+                        // Se há um texto salvo e NÃO é um dos padrões, usa o texto salvo (customizado)
+                        textoObservacao = observacaoPersonalizada;
                     } else {
-                         textoObservacao = observacaoPersonalizada;
+                        // Caso contrário, define o texto padrão para "CONCLUÍDO"
+                        textoObservacao = (timeToSeconds(tempoAtual) === TURNO_FIM_SEGUNDOS) ? 'Fim do turno atingido' : 'Ciclo concluído';
                     }
 
                 } else {
                     statusText = 'NÃO CONCLUÍDO';
                     statusClasseGeral = 'status-nao-concluido';
-                    // Define texto padrão se não houver edição manual/texto salvo
-                    if (!observacaoPersonalizada || observacaoPersonalizada === 'Ciclo concluído' || observacaoPersonalizada === 'NÃO CONCLUÍDO' || observacaoPersonalizada === 'Fim do turno atingido') {
-                         textoObservacao = 'NÃO CONCLUÍDO'; 
+                    
+                    if (observacaoPersonalizada && !defaultObsTexts.includes(observacaoPersonalizada.trim())) {
+                        // Se há um texto salvo e NÃO é um dos padrões, usa o texto salvo (customizado)
+                        textoObservacao = observacaoPersonalizada;
                     } else {
-                         textoObservacao = observacaoPersonalizada;
+                        // Caso contrário, define o texto padrão para "NÃO CONCLUÍDO"
+                        textoObservacao = 'NÃO CONCLUÍDO'; 
                     }
                 }
                 
@@ -815,9 +822,10 @@
                 statusText = 'ANDAMENTO';
                 statusClasseGeral = 'status-andamento';
                 
-                // Se houver observação salva (manual), exibe-a, senão deixa vazio.
-                textoObservacao = observacaoPersonalizada; 
-                if (!observacaoPersonalizada || observacaoPersonalizada === 'Ciclo concluído' || observacaoPersonalizada === 'NÃO CONCLUÍDO' || observacaoPersonalizada === 'Fim do turno atingido') {
+                // Se houver observação salva (manual) e NÃO for um texto padrão, exibe-a, senão deixa vazio.
+                if (observacaoPersonalizada && !defaultObsTexts.includes(observacaoPersonalizada.trim())) {
+                    textoObservacao = observacaoPersonalizada; 
+                } else {
                     textoObservacao = ''; 
                 }
 
@@ -1038,6 +1046,7 @@
         const produto = estadoAtual.produtoAtivo;
         const nowInSeconds = timeToSeconds(horarioBrasilia);
         const limiteCiclos = 500;
+        const defaultObsTexts = ['Ciclo concluído', 'NÃO CONCLUÍDO', 'Fim do turno atingido', ''];
         
         // Carrega as observações do cache para a verificação
         const observacoesSalvas = estadoAtual.observacoesSalvas;
@@ -1054,13 +1063,15 @@
                 const observacaoPersonalizada = cicloData.obs;
                 const isConcluidoSalvo = cicloData.concluido !== undefined ? cicloData.concluido : true;
 
+                // Verificamos se a observação no cache/input é uma observação CUSTOMIZADA
+                const isCustomObservation = observacaoPersonalizada && !defaultObsTexts.includes(observacaoPersonalizada.trim());
+
 
                 if (cicloSegundos <= nowInSeconds) {
                     // CICLO CONCLUÍDO (PASSADO)
                     
-                    // Se a observação não foi definida manualmente pelo usuário (se for um dos textos padrão),
-                    // atualiza com o texto padrão baseado no status salvo.
-                    if (!observacaoPersonalizada || observacaoPersonalizada === 'Ciclo concluído' || observacaoPersonalizada === 'NÃO CONCLUÍDO' || observacaoPersonalizada === 'Fim do turno atingido') {
+                    // Se a observação NÃO é customizada, atualiza-a com o texto padrão baseado no status.
+                    if (!isCustomObservation) {
                         if (isConcluidoSalvo) {
                              if (isEndOfShift) {
                                 obsInput.value = 'Fim do turno atingido';
@@ -1074,8 +1085,8 @@
                     
                 } else {
                     // CICLO EM ANDAMENTO (FUTURO)
-                    // Se a observação não foi definida manualmente, deixa vazio.
-                    if (!observacaoPersonalizada || observacaoPersonalizada === 'Ciclo concluído' || observacaoPersonalizada === 'NÃO CONCLUÍDO' || observacaoPersonalizada === 'Fim do turno atingido') {
+                    // Se a observação NÃO é customizada, deixa vazio.
+                    if (!isCustomObservation) {
                         obsInput.value = '';
                     }
                 }
@@ -1245,7 +1256,11 @@
                     lerTextoEmVoz("Ciclo finalizado"); 
                     
                     // RE-RENDERIZA a aba para que o ciclo recém-concluído mostre o checkbox
-                    trocarAba(produto); 
+                    // Removendo o re-render (trocarAba) aqui, pois ele está causando 
+                    // a re-renderização total e possivelmente o conflito de texto. 
+                    // O `atualizarStatusTabela` dentro de `atualizarRelogio` já cuida disso.
+                    
+                    // trocarAba(produto); // LINHA ORIGINAL REMOVIDA
                     
                     if (horarioBrasilia === TURNO_FIM) {
                          lerTextoEmVoz("Turno finalizado às 17 horas e 30 minutos.");
@@ -1396,5 +1411,3 @@
 </script>
 </body>
 </html>
-
-

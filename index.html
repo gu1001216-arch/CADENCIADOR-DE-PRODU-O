@@ -74,32 +74,39 @@
             font-size: 1.5em; 
             margin-top: 5px;
         }
-
-        /* Estilos para as abas */
-        .tabs {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ccc;
+        
+        /* NOVO ESTILO: Container para o Seletor de Produtos e Botão Fullscreen */
+        .product-selector-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 20px;
-            text-align: left;
-        }
-        .tab-button {
-            background-color: #ddd;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            outline: none;
-            transition: background-color 0.3s;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
-        }
-        .tab-button.active {
-            background-color: #2c3e50;
-            color: white;
-            border-bottom: 2px solid #2c3e50;
         }
         
+        #product-select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        #fullscreenToggle {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #3498db; /* Azul */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #fullscreenToggle:hover {
+            background-color: #2980b9;
+        }
+
+
         /* Estilos do novo relatório vertical */
         .log-container {
             width: 100%;
@@ -249,6 +256,114 @@
         #resetarObservacoes:hover {
             background-color: #e67e22;
         }
+        
+        /* ------------------------------------------------------------- */
+        /* NOVO ESTILO: MODO DASHBOARD TELA CHEIA (FULLSCREEN) */
+        /* ------------------------------------------------------------- */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2c3e50; /* Cor de fundo escura */
+            z-index: 1000;
+            display: none; /* Inicia oculto */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+
+        .fs-header-display {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 50px;
+        }
+        
+        .fs-row-1, .fs-row-2 {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .fs-relogio-box, .fs-countdown-box, .fs-ciclos-completos-box, .fs-ciclos-nao-completos-box {
+            flex: 1;
+            padding: 30px 40px;
+            border-radius: 12px;
+            font-weight: bold;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            margin: 0 10px;
+            min-width: 200px;
+            max-width: 400px;
+        }
+
+        .fs-relogio-box {
+            background-color: #ecf0f1;
+            font-size: 50px;
+            color: #2c3e50;
+        }
+        
+        .fs-ciclos-completos-box {
+            background-color: #2ecc71; /* Verde forte */
+            font-size: 30px;
+            color: white;
+        }
+
+        .fs-ciclos-nao-completos-box {
+            background-color: #e74c3c; /* Vermelho forte */
+            font-size: 30px;
+            color: white;
+        }
+        
+        .fs-countdown-box {
+            background-color: #3498db; /* Azul forte */
+            font-size: 30px;
+            color: white;
+            text-align: center;
+        }
+        
+        .fs-display-value {
+            display: block; 
+            font-size: 2.5em; 
+            margin-top: 10px;
+        }
+        
+        #fs-close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #fs-close-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .fs-current-product-info {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-top: -30px; 
+            margin-bottom: 30px;
+            width: 90%;
+            max-width: 1200px;
+            text-align: left;
+        }
+
     </style>
 </head>
 <body>
@@ -293,7 +408,12 @@
         </button>
     </div>
     
-    <div class="tabs" id="tabs-container">
+    <div class="product-selector-container">
+        <select id="product-select" onchange="trocarAba(this.value)">
+            </select>
+        <button id="fullscreenToggle" onclick="toggleFullscreenDashboard()" style="display: none;">
+            DASHBOARD TELA CHEIA
+        </button>
     </div>
     
     <div style="margin-bottom: 20px;">
@@ -309,6 +429,43 @@
         </div>
 
 </div>
+
+<div id="fullscreenDashboard" class="fullscreen-overlay">
+    
+    <div class="fs-current-product-info" id="fs-product-info">
+        Produto Ativo: N/A (Takt Time: N/A)
+    </div>
+    
+    <div class="fs-header-display">
+        <div class="fs-row-1">
+            <div class="fs-relogio-box" id="fs-relogio">
+                Carregando...
+            </div>
+            
+            <div class="fs-countdown-box" id="fs-countdown">
+                <strong>Próximo Evento:</strong>
+                <span class="fs-display-value">--:--:--</span>
+            </div>
+        </div>
+        
+        <div class="fs-row-2">
+            <div class="fs-ciclos-completos-box" id="fs-ciclosCompletos">
+                <strong>Ciclos Concluídos:</strong>
+                <span class="fs-display-value">0</span>
+            </div>
+
+            <div class="fs-ciclos-nao-completos-box" id="fs-ciclosNaoCompletos">
+                <strong>Ciclos Não Concluídos:</strong>
+                <span class="fs-display-value">0</span>
+            </div>
+        </div>
+    </div>
+
+    <button id="fs-close-button" onclick="toggleFullscreenDashboard()">
+        SAIR DO DASHBOARD
+    </button>
+</div>
+
 
 <script>
     // -----------------------------------------------------------------------------------
@@ -889,19 +1046,19 @@
 
     /**
      * Alterna a aba ativa e carrega o conteúdo.
+     * Agora carrega com base no valor do SELECT.
      */
     function trocarAba(novoProduto) {
         estadoAtual.produtoAtivo = novoProduto;
         
+        // Atualiza o select para garantir que ele reflita o estado (caso a função seja chamada de outro lugar)
+        const selectElement = document.getElementById('product-select');
+        if(selectElement) {
+            selectElement.value = novoProduto;
+        }
+
         // Limpa o cache e recarrega as observações para o novo produto
         estadoAtual.observacoesSalvas = carregarObservacoes(novoProduto);
-
-        document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.produto === novoProduto) {
-                btn.classList.add('active');
-            }
-        });
 
         const produtoData = PRODUTOS.find(p => p.nome === novoProduto);
         if (produtoData) {
@@ -1021,13 +1178,14 @@
 
 
     /**
-     * Atualiza apenas os dashboards de contagem (Ciclos Concluídos e Não Concluídos).
+     * Atualiza os dashboards de contagem (Normal e Fullscreen).
      */
     function atualizarContagemDashboard() {
         const nowInSeconds = getNowInSeconds();
         const horarioBrasilia = secondsToTime(nowInSeconds);
         const contagem = calcularCiclosConcluidosEfalhos(horarioBrasilia, estadoAtual.produtoAtivo);
         
+        // Normal
         const concluidosElement = document.getElementById('ciclosCompletos');
         const naoConcluidosElement = document.getElementById('ciclosNaoCompletos');
         
@@ -1036,6 +1194,23 @@
         }
         if (naoConcluidosElement) {
              naoConcluidosElement.querySelector('.display-value').textContent = contagem.naoConcluidos;
+        }
+        
+        // Fullscreen
+        const fsConcluidosElement = document.getElementById('fs-ciclosCompletos');
+        const fsNaoConcluidosElement = document.getElementById('fs-ciclosNaoCompletos');
+        const fsProductInfo = document.getElementById('fs-product-info');
+
+        const produtoData = PRODUTOS.find(p => p.nome === estadoAtual.produtoAtivo);
+
+        if (fsConcluidosElement) {
+            fsConcluidosElement.querySelector('.fs-display-value').textContent = contagem.concluidos;
+        }
+        if (fsNaoConcluidosElement) {
+            fsNaoConcluidosElement.querySelector('.fs-display-value').textContent = contagem.naoConcluidos;
+        }
+        if (fsProductInfo && produtoData) {
+             fsProductInfo.textContent = `Produto Ativo: ${produtoData.nome} (Takt Time: ${produtoData.tactTime} min)`;
         }
     }
 
@@ -1109,7 +1284,12 @@
             now.getSeconds().toString().padStart(2, '0')
         ].join(':');
         
+        // Atualiza os relógios (Normal e Fullscreen)
         document.getElementById('relogio').textContent = horarioBrasilia;
+        const fsRelogioElement = document.getElementById('fs-relogio');
+        if (fsRelogioElement) {
+             fsRelogioElement.textContent = horarioBrasilia;
+        }
         
         // 1. Atualiza o Status e Observações da Tabela (mantendo edições)
         atualizarStatusTabela(horarioBrasilia);
@@ -1131,19 +1311,35 @@
      */
     function atualizarContagemRegressiva(horarioBrasilia) {
         const countdownElement = document.getElementById('countdown');
+        const fsCountdownElement = document.getElementById('fs-countdown');
         const nowInSeconds = timeToSeconds(horarioBrasilia);
         const produtoAtivo = estadoAtual.produtoAtivo;
+        
+        let countdownHTML = '';
+        let fsCountdownHTML = '';
         
         // 1. Lógica para quando a linha está parada (PRIORIDADE MÁXIMA)
         if (isPaused) {
             const tempoParadoAgora = getNowInSeconds() - horaInicioPausa;
             const tempoFormatado = secondsToCountdown(tempoParadoAgora);
 
-            countdownElement.innerHTML = `
+            countdownHTML = `
                 <strong style="color: #e74c3c;">LINHA PARADA</strong>
                 <span class="display-value" style="color: #e74c3c;">${tempoFormatado}</span>
             `;
+            fsCountdownHTML = `
+                <strong style="font-size: 1.2em;">LINHA PARADA</strong>
+                <span class="fs-display-value">${tempoFormatado}</span>
+            `;
+            
+            countdownElement.innerHTML = countdownHTML;
             countdownElement.style.backgroundColor = '#f9ebea'; // Cor de alerta
+
+            if (fsCountdownElement) {
+                 fsCountdownElement.innerHTML = fsCountdownHTML;
+                 fsCountdownElement.style.backgroundColor = '#e74c3c';
+            }
+
             return;
         }
 
@@ -1200,17 +1396,40 @@
             const segundosRestantes = proximoEvento.tempoSegundos - nowInSeconds;
             const countdownTempo = secondsToCountdown(segundosRestantes);
             
-            countdownElement.innerHTML = `
+            countdownHTML = `
                 <strong>${proximoEvento.aviso}:</strong>
                 <span class="display-value" style="color: #3498db;">${countdownTempo}</span>
             `;
+            fsCountdownHTML = `
+                <strong style="font-size: 1.2em;">${proximoEvento.aviso}:</strong>
+                <span class="fs-display-value">${countdownTempo}</span>
+            `;
+            
+            countdownElement.innerHTML = countdownHTML;
             countdownElement.style.backgroundColor = '#f0f8ff';
+            
+            if (fsCountdownElement) {
+                 fsCountdownElement.innerHTML = fsCountdownHTML;
+                 fsCountdownElement.style.backgroundColor = '#3498db';
+            }
+            
         } else {
-            countdownElement.innerHTML = `
+            countdownHTML = `
                 <strong>FIM DO TURNO</strong>
                 <span class="display-value" style="color: #2c3e50;">17:30:00 Alcançado</span>
             `;
+             fsCountdownHTML = `
+                <strong style="font-size: 1.2em;">FIM DO TURNO</strong>
+                <span class="fs-display-value">17:30:00 Alcançado</span>
+            `;
+            
+            countdownElement.innerHTML = countdownHTML;
             countdownElement.style.backgroundColor = '#ecf0f1';
+            
+            if (fsCountdownElement) {
+                 fsCountdownElement.innerHTML = fsCountdownHTML;
+                 fsCountdownElement.style.backgroundColor = '#2c3e50';
+            }
         }
     }
 
@@ -1280,6 +1499,51 @@
     }
     
     // -----------------------------------------------------------------------------------
+    // FUNÇÕES DE TELA CHEIA (FULLSCREEN)
+    // -----------------------------------------------------------------------------------
+    
+    /**
+     * Alterna a visibilidade do dashboard em tela cheia.
+     */
+    function toggleFullscreenDashboard() {
+        const fsDashboard = document.getElementById('fullscreenDashboard');
+        
+        if (fsDashboard.classList.contains('active')) {
+            // SAIR
+            fsDashboard.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Habilita a rolagem normal
+            
+            // Tenta sair do modo Fullscreen nativo do navegador (se estiver)
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { /* Firefox */
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE/Edge */
+                document.msExitFullscreen();
+            }
+
+        } else {
+            // ENTRAR
+            fsDashboard.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Remove a rolagem
+            
+            // Tenta entrar no modo Fullscreen nativo do navegador
+            const element = fsDashboard;
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) { /* Firefox */
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) { /* IE/Edge */
+                element.msRequestFullscreen();
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------
     // BLOQUEIO DE TELA (SCREEN WAKE LOCK API)
     // -----------------------------------------------------------------------------------
     
@@ -1336,6 +1600,7 @@
         const botaoContinuar = document.getElementById('continuarLinha');
         const botaoExportar = document.getElementById('exportarRelatorio');
         const botaoReset = document.getElementById('resetarObservacoes');
+        const botaoFullscreen = document.getElementById('fullscreenToggle');
 
 
         if (botaoIniciar) {
@@ -1353,6 +1618,9 @@
         if (botaoReset) {
             botaoReset.style.display = 'inline-block';
         }
+        if (botaoFullscreen) {
+            botaoFullscreen.style.display = 'inline-block'; // Mostra o botão de fullscreen
+        }
         
         // Inicia a atualização do relógio e status a cada segundo
         setInterval(atualizarRelogio, 1000);
@@ -1363,20 +1631,20 @@
     }
 
     function inicializar() {
-        const tabsContainer = document.getElementById('tabs-container');
+        const selectElement = document.getElementById('product-select');
         
+        // 1. Preenche o SELECT de produtos
         PRODUTOS.forEach(produto => {
-            const button = document.createElement('button');
-            button.className = 'tab-button';
-            button.textContent = produto.nome;
-            button.dataset.produto = produto.nome;
-            button.onclick = () => trocarAba(produto.nome);
-            tabsContainer.appendChild(button);
+            const option = document.createElement('option');
+            option.value = produto.nome;
+            option.textContent = produto.nome;
+            selectElement.appendChild(option);
         });
 
-        // Troca para a primeira aba (ou a que estava ativa na sessão)
+        // 2. Troca para a primeira aba (ou a que estava ativa na sessão)
         trocarAba(estadoAtual.produtoAtivo);
 
+        // 3. Configura Event Listeners
         const botaoIniciar = document.getElementById('iniciarSistema');
         if (botaoIniciar) {
             botaoIniciar.addEventListener('click', iniciarSistema);
@@ -1390,7 +1658,7 @@
             botaoReset.addEventListener('click', resetarObservacoes);
         }
 
-        // Atualiza a primeira vez para carregar o relógio
+        // 4. Atualiza a primeira vez para carregar o relógio
         atualizarRelogio();
     }
 
@@ -1399,7 +1667,8 @@
     window.salvarObservacao = salvarObservacao;
     window.resetarObservacoes = resetarObservacoes;
     window.salvarStatus = salvarStatus; 
-    window.atualizarContagemDashboard = atualizarContagemDashboard; // Tornando global para uso em salvarStatus
+    window.atualizarContagemDashboard = atualizarContagemDashboard; 
+    window.toggleFullscreenDashboard = toggleFullscreenDashboard; // Nova função global
 
     inicializar();
 </script>

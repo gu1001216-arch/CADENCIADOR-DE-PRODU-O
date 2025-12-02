@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Produção - Turno 1 (Ciclos até 17:30)</title>
     <style>
+        /* ======================================================================== */
+        /* ESTILOS EXISTENTES (Mantidos e Adicionados) */
+        /* ======================================================================== */
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -54,10 +58,9 @@
             color: #2c3e50;
         }
 
-        /* NOVO ESTILO: Dashboard de Ciclos Não Concluídos */
         .ciclos-nao-completos-box {
-            background-color: #f8d7da; /* Cor de fundo suave para alerta */
-            border: 2px solid #e74c3c; /* Borda Vermelha */
+            background-color: #f8d7da; 
+            border: 2px solid #e74c3c; 
             font-size: 20px;
             color: #2c3e50;
         }
@@ -91,7 +94,7 @@
             border: 1px solid #ccc;
         }
         
-        #fullscreenToggle {
+        #fullscreenToggle, #adminToggle { /* ADICIONADO #adminToggle */
             padding: 10px 15px;
             font-size: 16px;
             font-weight: bold;
@@ -102,7 +105,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        #fullscreenToggle:hover {
+        #fullscreenToggle:hover, #adminToggle:hover { /* ADICIONADO #adminToggle */
             background-color: #2980b9;
         }
 
@@ -110,10 +113,10 @@
         /* Estilos do novo relatório vertical */
         .log-container {
             width: 100%;
-            max-width: 800px; /* Limite a largura para melhor visualização */
+            max-width: 800px; 
             margin: 0 auto;
             overflow-x: auto;
-            max-height: 50vh; /* Permite rolagem vertical no corpo da tabela */
+            max-height: 50vh; 
             overflow-y: scroll;
             border: 1px solid #ccc;
         }
@@ -121,11 +124,11 @@
         .production-log {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* Ajuda a fixar a largura das colunas */
+            table-layout: fixed; 
         }
 
         .production-log thead {
-            position: sticky; /* Congela o cabeçalho no topo */
+            position: sticky; 
             top: 0;
             background-color: #2c3e50;
             color: white;
@@ -139,11 +142,10 @@
             vertical-align: middle;
         }
 
-        /* Largura das colunas (Ciclo, Horário, Status, Observações) */
-        .production-log th:nth-child(1) { width: 15%; } /* Ciclo # */
-        .production-log th:nth-child(2) { width: 25%; } /* Horário Final */ 
-        .production-log th:nth-child(3) { width: 20%; } /* Status */
-        .production-log th:nth-child(4) { width: 40%; } /* Observações */
+        .production-log th:nth-child(1) { width: 15%; } 
+        .production-log th:nth-child(2) { width: 25%; } 
+        .production-log th:nth-child(3) { width: 20%; } 
+        .production-log th:nth-child(4) { width: 40%; } 
 
         .production-log tbody tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -152,14 +154,13 @@
         .production-log input[type="time"] {
             font-size: 16px;
             padding: 3px;
-            width: 110px; /* Aumentado para acomodar HH:MM:SS */
+            width: 110px; 
             text-align: center;
             border: none;
             background-color: transparent;
             font-weight: bold;
         }
         
-        /* Campo de Observação */
         .observation-input {
             width: 95%;
             padding: 5px;
@@ -169,25 +170,22 @@
             font-size: 14px;
         }
         
-        /* Estilos para o Status */
         .status-celula {
-            display: block; /* Garante que o texto fique em uma linha separada do checkbox */
+            display: block; 
             font-weight: bold;
             margin-top: 5px;
         }
         
         .status-concluido {
-            color: #28a745; /* Verde */
+            color: #28a745; 
         }
-        /* NOVO ESTILO: Status Não Concluído */
         .status-nao-concluido {
-            color: #e74c3c; /* Vermelho */
+            color: #e74c3c; 
         }
         .status-andamento {
             font-weight: bold;
-            color: #ffc107; /* Amarelo/Laranja */
+            color: #ffc107; 
         }
-
 
         .tact-time-info {
             font-size: 1.2em;
@@ -195,12 +193,12 @@
             color: #2c3e50;
             margin-bottom: 15px;
         }
-        /* Estilo para o novo botão de início */
+
         #iniciarSistema {
             padding: 15px 30px; 
             font-size: 20px; 
             font-weight: bold;
-            background-color: #2ecc71; /* Verde */
+            background-color: #2ecc71; 
             color: white;
             border: none;
             border-radius: 5px;
@@ -211,7 +209,7 @@
         #iniciarSistema:hover {
             background-color: #27ae60;
         }
-        /* Estilos para os novos botões de controle de linha */
+
         .controle-linha {
             margin-bottom: 20px;
         }
@@ -225,15 +223,15 @@
             transition: background-color 0.3s;
         }
         #pararLinha {
-            background-color: #e74c3c; /* Vermelho */
+            background-color: #e74c3c; 
             color: white;
             margin-right: 10px;
         }
         #continuarLinha {
-            background-color: #3498db; /* Azul */
+            background-color: #3498db; 
             color: white;
         }
-        /* Estilo para o botão de exportar/reset */
+        
         #exportarRelatorio, #resetarObservacoes {
             padding: 10px 20px; 
             font-size: 16px; 
@@ -245,20 +243,20 @@
             transition: background-color 0.3s;
         }
         #exportarRelatorio {
-            background-color: #007bff; /* Azul */
+            background-color: #007bff; 
         }
         #exportarRelatorio:hover {
             background-color: #0056b3;
         }
         #resetarObservacoes {
-            background-color: #f39c12; /* Laranja */
+            background-color: #f39c12; 
         }
         #resetarObservacoes:hover {
             background-color: #e67e22;
         }
         
         /* ------------------------------------------------------------- */
-        /* NOVO ESTILO: MODO DASHBOARD TELA CHEIA (FULLSCREEN) */
+        /* ESTILOS FULLSCREEN (Mantidos) */
         /* ------------------------------------------------------------- */
         .fullscreen-overlay {
             position: fixed;
@@ -266,9 +264,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #2c3e50; /* Cor de fundo escura */
+            background-color: #2c3e50; 
             z-index: 1000;
-            display: none; /* Inicia oculto */
+            display: none; 
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -279,6 +277,7 @@
             display: flex;
         }
 
+        /* [Estilos fs-header-display, fs-row-1, fs-row-2, fs-relogio-box, etc. omitidos para brevidade] */
         .fs-header-display {
             display: flex;
             flex-direction: column;
@@ -313,19 +312,19 @@
         }
         
         .fs-ciclos-completos-box {
-            background-color: #2ecc71; /* Verde forte */
+            background-color: #2ecc71; 
             font-size: 30px;
             color: white;
         }
 
         .fs-ciclos-nao-completos-box {
-            background-color: #e74c3c; /* Vermelho forte */
+            background-color: #e74c3c; 
             font-size: 30px;
             color: white;
         }
         
         .fs-countdown-box {
-            background-color: #3498db; /* Azul forte */
+            background-color: #3498db; 
             font-size: 30px;
             color: white;
             text-align: center;
@@ -362,6 +361,76 @@
             width: 90%;
             max-width: 1200px;
             text-align: left;
+        }
+
+        /* ------------------------------------------------------------- */
+        /* NOVO ESTILO: PAINEL ADMIN TACT TIME */
+        /* ------------------------------------------------------------- */
+        .admin-panel {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            display: none; /* Inicia oculto */
+        }
+
+        .admin-panel h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        #tactTimeEditor {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #tactTimeEditor th, #tactTimeEditor td {
+            border: 1px solid #eee;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        #tactTimeEditor th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            width: 70%;
+        }
+
+        .tact-time-input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        #admin-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #salvarTactTimes {
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        #salvarTactTimes:hover {
+            background-color: #27ae60;
         }
 
     </style>
@@ -414,6 +483,9 @@
         <button id="fullscreenToggle" onclick="toggleFullscreenDashboard()" style="display: none;">
             DASHBOARD TELA CHEIA
         </button>
+        <button id="adminToggle" onclick="abrirPainelAdmin()" style="display: none;">
+            ADMIN TAKT TIME
+        </button>
     </div>
     
     <div style="margin-bottom: 20px;">
@@ -425,6 +497,25 @@
         </button>
     </div>
 
+    <div id="adminPanel" class="admin-panel">
+        <h2>Painel de Edição do Takt Time</h2>
+        <div style="margin-bottom: 15px; color: #e74c3c;">
+            **Atenção:** Mudar o Takt Time afeta todos os cálculos de ciclo. Use apenas quando necessário!
+        </div>
+        <table id="tactTimeEditor">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Takt Time Atual (minutos)</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+        <div id="admin-actions">
+            <button id="salvarTactTimes" onclick="salvarTactTimes()">SALVAR ALTERAÇÕES</button>
+        </div>
+    </div>
     <div id="product-content">
         </div>
 
@@ -475,6 +566,7 @@
     const TURNO_INICIO = '06:00:00';
     const TURNO_FIM = '17:30:00'; // Finalização do turno
     const TURNO_FIM_SEGUNDOS = 63000; // 17:30:00 em segundos
+    const SENHA_ADMIN = 'producao2025'; // <<---------------------- Sua Senha de Administração
 
     // Avisos de voz para o início dos intervalos
     const INTERVALOS = [
@@ -483,7 +575,8 @@
         { inicio: '13:50:00', fim: '14:05:00', nome: 'Café 2', avisoVoz: 'Intervalo iniciado, bom café a todos!' },
     ];
 
-    const PRODUTOS = [
+    // DADOS PADRÃO (Serão substituídos se houver dados salvos no localStorage)
+    const PRODUTOS_PADRAO = [
         // Lista completa de produtos e seus Tact Times em minutos
         { nome: 'PATCH PANEL PPD24', tactTime: 3 },
         { nome: 'PATCH PANEL PPDB24', tactTime: 4 },
@@ -553,10 +646,14 @@
         { nome: 'CAIXA ORG. PRETA', tactTime: 4.25 },
         { nome: 'CAIXA ORG. BRANCA', tactTime: 4.25 },
     ];
+    
+    // Variável que armazena os produtos com os Takt Times ATIVOS (será carregada na inicialização)
+    let PRODUTOS = []; 
+
 
     // Objeto para gerenciar o estado
     let estadoAtual = {
-        produtoAtivo: PRODUTOS[0].nome,
+        produtoAtivo: '', // Será definido em inicializar()
         // Cache: agora armazena { ciclo: { obs: string, concluido: boolean } }
         observacoesSalvas: {} 
     };
@@ -567,7 +664,141 @@
     let horaInicioPausa = 0; // Momento da última pausa em segundos
 
     // -----------------------------------------------------------------------------------
-    // FUNÇÕES DE PERSISTÊNCIA (localStorage)
+    // NOVAS FUNÇÕES DE PERSISTÊNCIA DE TACT TIME
+    // -----------------------------------------------------------------------------------
+
+    /**
+     * Carrega os Takt Times do localStorage ou retorna os padrão.
+     * Mescla para garantir que novos produtos sejam incluídos.
+     */
+    function carregarTactTimes() {
+        try {
+            const savedTactTimes = localStorage.getItem('tactTimesConfig');
+            const savedData = savedTactTimes ? JSON.parse(savedTactTimes) : {};
+            
+            // Inicia com os dados padrão (garantindo que novos produtos sejam incluídos)
+            const produtosAtivos = [...PRODUTOS_PADRAO];
+
+            // Atualiza os dados padrão com os valores salvos
+            for (const produto of produtosAtivos) {
+                if (savedData[produto.nome] !== undefined) {
+                    produto.tactTime = savedData[produto.nome];
+                }
+            }
+            
+            return produtosAtivos;
+
+        } catch (e) {
+            console.error("Erro ao carregar Takt Times:", e);
+            return PRODUTOS_PADRAO; // Retorna o padrão em caso de erro
+        }
+    }
+
+    /**
+     * Salva todos os Takt Times editados no localStorage.
+     */
+    function salvarTactTimes() {
+        // Pega os inputs do painel
+        const inputs = document.querySelectorAll('#tactTimeEditor input[type="number"]');
+        const novosTactTimes = {};
+        let erro = false;
+        
+        inputs.forEach(input => {
+            const produtoNome = input.dataset.produto;
+            const novoValor = parseFloat(input.value);
+            
+            if (isNaN(novoValor) || novoValor <= 0) {
+                alert(`Erro: O Takt Time para o produto "${produtoNome}" deve ser um número positivo.`);
+                erro = true;
+                return;
+            }
+            novosTactTimes[produtoNome] = novoValor;
+        });
+
+        if (erro) return; // Se houve erro, para aqui
+
+        try {
+            // 1. Salva no localStorage
+            localStorage.setItem('tactTimesConfig', JSON.stringify(novosTactTimes));
+            
+            // 2. Recarrega a variável PRODUTOS global
+            PRODUTOS = carregarTactTimes();
+            
+            // 3. Re-inicializa a tela para aplicar as mudanças
+            // Isso atualiza o SELECT, o Takt Time Info, e o grid de tempos.
+            alert("Takt Times salvos com sucesso! A tela será recarregada para aplicar as mudanças.");
+            // Trocar para a aba atual força a re-renderização da tabela
+            trocarAba(estadoAtual.produtoAtivo); 
+            
+            // Fecha o painel
+            fecharPainelAdmin(); 
+
+        } catch (e) {
+            console.error("Erro ao salvar Takt Times:", e);
+            alert("Erro ao tentar salvar os Takt Times.");
+        }
+    }
+
+
+    // -----------------------------------------------------------------------------------
+    // FUNÇÕES DE ADMINISTRAÇÃO DO TACT TIME
+    // -----------------------------------------------------------------------------------
+
+    /**
+     * Gera o HTML da tabela de edição de Takt Time.
+     */
+    function gerarTabelaAdmin() {
+        const tbody = document.querySelector('#tactTimeEditor tbody');
+        let html = '';
+        
+        // Use a variável PRODUTOS ATIVA (que já inclui os valores salvos)
+        PRODUTOS.forEach(produto => {
+            html += `
+                <tr>
+                    <td>${produto.nome}</td>
+                    <td>
+                        <input type="number" 
+                                class="tact-time-input" 
+                                value="${produto.tactTime}" 
+                                min="0.5" step="0.5" 
+                                data-produto="${produto.nome}">
+                        min
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    }
+
+    /**
+     * Controla a abertura e fechamento do painel de administração.
+     */
+    function abrirPainelAdmin() {
+        const senha = prompt("Insira a senha de administrador:");
+        if (senha === SENHA_ADMIN) {
+            gerarTabelaAdmin(); // Popula a tabela
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('product-content').style.display = 'none';
+            document.getElementById('adminToggle').textContent = 'FECHAR ADMIN';
+            document.getElementById('adminToggle').onclick = fecharPainelAdmin;
+        } else if (senha !== null) {
+            alert("Senha incorreta.");
+        }
+    }
+
+    /**
+     * Fecha o painel de administração.
+     */
+    function fecharPainelAdmin() {
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('product-content').style.display = 'block';
+        document.getElementById('adminToggle').textContent = 'ADMIN TACT TIME';
+        document.getElementById('adminToggle').onclick = abrirPainelAdmin;
+    }
+
+    // -----------------------------------------------------------------------------------
+    // FUNÇÕES DE PERSISTÊNCIA (localStorage) - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
 
     /**
@@ -706,7 +937,7 @@
     }
     
     // -----------------------------------------------------------------------------------
-    // FUNÇÃO DE RESET
+    // FUNÇÃO DE RESET - JÁ EXISTENTE
     // -----------------------------------------------------------------------------------
 
     /**
@@ -738,7 +969,7 @@
     }
     
     // -----------------------------------------------------------------------------------
-    // FUNÇÕES DE UTILIDADE DE TEMPO
+    // FUNÇÕES DE UTILIDADE DE TEMPO - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
 
     /** Obtém o horário atual em segundos */
@@ -835,7 +1066,7 @@
     }
     
     // -----------------------------------------------------------------------------------
-    // FUNÇÕES DE CONTROLE DE LINHA
+    // FUNÇÕES DE CONTROLE DE LINHA - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
 
     function pararLinha() {
@@ -874,7 +1105,7 @@
     }
 
     // -----------------------------------------------------------------------------------
-    // FUNÇÕES DE GERAÇÃO E EXPORTAÇÃO
+    // FUNÇÕES DE GERAÇÃO E EXPORTAÇÃO - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
 
     /**
@@ -1050,6 +1281,13 @@
      * Agora carrega com base no valor do SELECT.
      */
     function trocarAba(novoProduto) {
+        // Encontra o produto, seja o primeiro da lista, ou o salvo
+        if (!novoProduto && PRODUTOS.length > 0) {
+            novoProduto = PRODUTOS[0].nome;
+        } else if (!novoProduto && PRODUTOS.length === 0) {
+            return; // Sai se não houver produtos
+        }
+        
         estadoAtual.produtoAtivo = novoProduto;
         
         // Atualiza o select para garantir que ele reflita o estado (caso a função seja chamada de outro lugar)
@@ -1131,7 +1369,7 @@
 
 
     // -----------------------------------------------------------------------------------
-    // FUNÇÕES DE ATUALIZAÇÃO DO RELÓGIO E DASHBOARD
+    // FUNÇÕES DE ATUALIZAÇÃO DO RELÓGIO E DASHBOARD - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
 
     /**
@@ -1218,7 +1456,6 @@
 
     /**
      * Atualiza o Status e o campo de Observação de cada ciclo na tabela, preservando edições.
-     * **PRINCIPAL FUNÇÃO MODIFICADA PARA ATUALIZAÇÃO AUTOMÁTICA DE STATUS.**
      */
     function atualizarStatusTabela(horarioBrasilia) {
         const produto = estadoAtual.produtoAtivo;
@@ -1546,7 +1783,7 @@
     }
     
     // -----------------------------------------------------------------------------------
-    // FUNÇÕES DE TELA CHEIA (FULLSCREEN)
+    // FUNÇÕES DE TELA CHEIA (FULLSCREEN) - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
     
     /**
@@ -1591,7 +1828,7 @@
     }
 
     // -----------------------------------------------------------------------------------
-    // BLOQUEIO DE TELA (SCREEN WAKE LOCK API)
+    // BLOQUEIO DE TELA (SCREEN WAKE LOCK API) - JÁ EXISTENTES
     // -----------------------------------------------------------------------------------
     
     let wakeLock = null;
@@ -1648,6 +1885,7 @@
         const botaoExportar = document.getElementById('exportarRelatorio');
         const botaoReset = document.getElementById('resetarObservacoes');
         const botaoFullscreen = document.getElementById('fullscreenToggle');
+        const botaoAdmin = document.getElementById('adminToggle'); // Novo Botão
 
 
         if (botaoIniciar) {
@@ -1668,6 +1906,9 @@
         if (botaoFullscreen) {
             botaoFullscreen.style.display = 'inline-block'; // Mostra o botão de fullscreen
         }
+        if (botaoAdmin) { // Novo Botão
+            botaoAdmin.style.display = 'inline-block'; 
+        }
         
         // Inicia a atualização do relógio e status a cada segundo
         setInterval(atualizarRelogio, 1000);
@@ -1678,20 +1919,27 @@
     }
 
     function inicializar() {
+        // 1. Carrega os Takt Times (se houverem, senão usa o padrão)
+        PRODUTOS = carregarTactTimes();
+
+        // 2. Preenche o SELECT de produtos
         const selectElement = document.getElementById('product-select');
-        
-        // 1. Preenche o SELECT de produtos
+        selectElement.innerHTML = ''; // Limpa antes de preencher
         PRODUTOS.forEach(produto => {
             const option = document.createElement('option');
             option.value = produto.nome;
             option.textContent = produto.nome;
             selectElement.appendChild(option);
         });
+        
+        // Define o produto ativo inicial
+        estadoAtual.produtoAtivo = PRODUTOS[0] ? PRODUTOS[0].nome : '';
 
-        // 2. Troca para a primeira aba (ou a que estava ativa na sessão)
+
+        // 3. Troca para a primeira aba (ou a que estava ativa na sessão)
         trocarAba(estadoAtual.produtoAtivo);
 
-        // 3. Configura Event Listeners
+        // 4. Configura Event Listeners
         const botaoIniciar = document.getElementById('iniciarSistema');
         if (botaoIniciar) {
             botaoIniciar.addEventListener('click', iniciarSistema);
@@ -1704,8 +1952,10 @@
         if (botaoReset) {
             botaoReset.addEventListener('click', resetarObservacoes);
         }
+        // Listener do botão de Salvar Tact Times já está no HTML (onclick="salvarTactTimes()")
 
-        // 4. Atualiza a primeira vez para carregar o relógio
+
+        // 5. Atualiza a primeira vez para carregar o relógio
         atualizarRelogio();
     }
 
@@ -1715,8 +1965,11 @@
     window.resetarObservacoes = resetarObservacoes;
     window.salvarStatus = salvarStatus; 
     window.atualizarContagemDashboard = atualizarContagemDashboard; 
-    window.toggleFullscreenDashboard = toggleFullscreenDashboard; // Nova função global
-    window.trocarAba = trocarAba; // Garante que o onchange do select funcione
+    window.toggleFullscreenDashboard = toggleFullscreenDashboard; 
+    window.trocarAba = trocarAba; 
+    window.abrirPainelAdmin = abrirPainelAdmin; // Nova
+    window.salvarTactTimes = salvarTactTimes; // Nova
+    window.fecharPainelAdmin = fecharPainelAdmin; // Nova
 
     inicializar();
 </script>
